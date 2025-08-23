@@ -57,11 +57,6 @@ export const jobsService = {
     return response.data
   },
 
-  async getJobApplications(jobId: number, page = 0, size = 10): Promise<PageResponse<Application>> {
-    const response = await api.get(`/jobs/${jobId}/applications?page=${page}&size=${size}`)
-    return response.data
-  },
-
   async getEmployerApplications(page = 0, size = 10): Promise<PageResponse<Application>> {
     const response = await api.get(`/jobs/applications?page=${page}&size=${size}`)
     return response.data
@@ -88,14 +83,15 @@ export const jobsService = {
     return response.data
   },
 
-  // Statistics
-  async getDashboardStats(): Promise<any> {
-    const response = await api.get('/dashboard/stats')
+  // Company endpoints
+  async getCompany(id: string): Promise<any> {
+    const response = await api.get(`/companies/${id}`)
     return response.data
   },
 
-  async getJobStats(jobId: number): Promise<any> {
-    const response = await api.get(`/jobs/${jobId}/stats`)
+  // Statistics
+  async getDashboardStats(): Promise<any> {
+    const response = await api.get('/dashboard/stats')
     return response.data
   }
 }
