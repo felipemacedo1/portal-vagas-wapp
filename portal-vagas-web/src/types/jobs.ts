@@ -7,8 +7,10 @@ export interface Job {
   salaryMax?: number
   location: string
   remote: boolean
+  type: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP'
   status: 'DRAFT' | 'PENDING' | 'APPROVED' | 'REJECTED'
   company: Company
+  applicationsCount: number
   createdAt: string
   updatedAt: string
 }
@@ -35,4 +37,6 @@ export interface PageResponse<T> {
   totalPages: number
   size: number
   number: number
+  first: boolean
+  last: boolean
 }

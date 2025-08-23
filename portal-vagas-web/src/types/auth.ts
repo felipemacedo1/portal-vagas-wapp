@@ -20,3 +20,7 @@ export interface AuthResponse {
   refreshToken: string
   user: User
 }
+
+export interface RefreshRequest {
+  refreshToken: string
+}
