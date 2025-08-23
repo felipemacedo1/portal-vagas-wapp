@@ -1,50 +1,15 @@
 import { Badge } from 'primereact/badge'
 import { Button } from 'primereact/button'
+import { Card } from 'primereact/card'
+import { Message } from 'primereact/message'
 import { useNavigate } from 'react-router-dom'
 import { DataTable } from '../../shared/components/DataTable'
+import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
+import { useCandidateApplications } from '../../hooks/useApplications'
 
 export const ApplicationsList = () => {
   const navigate = useNavigate()
-
-  // Mock data - will be replaced with API call
-  const applications = [
-    {
-      id: 1,
-      job: {
-        id: 1,
-        title: 'Desenvolvedor React Sênior',
-        company: { name: 'TechCorp Solutions' }
-      },
-      status: 'PENDING',
-      appliedAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-15T10:00:00Z',
-      coverLetter: 'Tenho 5 anos de experiência com React...'
-    },
-    {
-      id: 2,
-      job: {
-        id: 2,
-        title: 'Frontend Developer',
-        company: { name: 'StartupXYZ' }
-      },
-      status: 'APPROVED',
-      appliedAt: '2024-01-10T14:00:00Z',
-      updatedAt: '2024-01-12T09:00:00Z',
-      coverLetter: 'Sou apaixonado por criar interfaces...'
-    },
-    {
-      id: 3,
-      job: {
-        id: 3,
-        title: 'Full Stack Developer',
-        company: { name: 'InnovaCorp' }
-      },
-      status: 'REJECTED',
-      appliedAt: '2024-01-08T16:00:00Z',
-      updatedAt: '2024-01-14T11:00:00Z',
-      coverLetter: 'Tenho experiência tanto em frontend...'
-    }
-  ]
+  const { data, isLoading, error, refetch } = useCandidateApplications(0, 20)
 
   const getStatusBadge = (status: string) => {
     const config = {
@@ -98,14 +63,47 @@ export const ApplicationsList = () => {
         tooltip="Ver Vaga"
         onClick={() => navigate(`/jobs/${rowData.job.id}`)}
       />
-      <Button
-        icon="pi pi-file-edit"
-        className="p-button-rounded p-button-text"
-        tooltip="Ver Candidatura"
-        onClick={() => console.log('View application:', rowData.id)}
-      />
     </div>
   )
+
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-900 m-0">Minhas Candidaturas</h1>
+            <p className="text-600 m-0">Acompanhe o status das suas candidaturas</p>
+          </div>
+        </div>
+        <LoadingSkeleton type="table" count={5} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div>
+        <div className="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-900 m-0">Minhas Candidaturas</h1>
+            <p className="text-600 m-0">Acompanhe o status das suas candidaturas</p>
+          </div>
+        </div>
+        <Card>
+          <Message 
+            severity="error" 
+            text="Erro ao carregar candidaturas. Tente novamente." 
+          />
+          <div className="text-center mt-3">
+            <Button
+              label="Tentar Novamente"
+              onClick={() => refetch()}
+            />
+          </div>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -117,13 +115,14 @@ export const ApplicationsList = () => {
         <Button
           label="Buscar Vagas"
           icon="pi pi-search"
+          className="btn-gradient"
           onClick={() => navigate('/')}
         />
       </div>
 
-      {applications.length === 0 ? (
-        <div className="text-center p-8">
-          <i className="pi pi-briefcase text-4xl text-400 mb-4"></i>
+      {!data?.content || data.content.length === 0 ? (
+        <Card className="card-modern text-center p-6">
+          <i className="pi pi-send text-4xl text-primary-300 mb-4"></i>
           <h3 className="text-900 mb-3">Nenhuma candidatura ainda</h3>
           <p className="text-600 mb-4">
             Comece a se candidatar para vagas que combinam com seu perfil
@@ -131,12 +130,13 @@ export const ApplicationsList = () => {
           <Button
             label="Buscar Vagas"
             icon="pi pi-search"
+            className="btn-gradient"
             onClick={() => navigate('/')}
           />
-        </div>
+        </Card>
       ) : (
         <DataTable
-          data={applications}
+          data={data.content}
           columns={columns}
           actions={getActions}
           exportable

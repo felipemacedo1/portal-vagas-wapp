@@ -2,61 +2,54 @@ import { Card } from 'primereact/card'
 import { Button } from 'primereact/button'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../core/stores/authStore'
-import { useAppStore } from '../../core/stores/appStore'
-import { useCandidateApplications, useApplicationStats } from '../../shared/hooks/useApplications'
+import { useCandidateApplications } from '../../hooks/useApplications'
+import { useCandidateStats } from '../../hooks/useStats'
+import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
 
 export const CandidateDashboard = () => {
   const { user } = useAuthStore()
-  const { applications } = useAppStore()
   const navigate = useNavigate()
   
-  // Load applications data
-  const { data: applicationsData, isLoading } = useCandidateApplications(0, 5)
-  const stats = useApplicationStats()
+  const { data: applicationsData } = useCandidateApplications(0, 5)
+  const { data: stats, isLoading: statsLoading } = useCandidateStats()
+
+  const applications = applicationsData?.content || []
 
   const statsCards = [
     { 
       label: 'Candidaturas Enviadas', 
-      value: stats.total, 
+      value: stats?.totalApplications || 0, 
       icon: 'pi-send', 
       color: 'blue',
       action: () => navigate('/candidate/applications')
     },
     { 
       label: 'Em Análise', 
-      value: stats.pending, 
+      value: stats?.pendingApplications || 0, 
       icon: 'pi-clock', 
       color: 'orange',
       action: () => navigate('/candidate/applications')
     },
     { 
       label: 'Aprovadas', 
-      value: stats.approved, 
+      value: stats?.approvedApplications || 0, 
       icon: 'pi-check-circle', 
       color: 'green',
       action: () => navigate('/candidate/applications')
     },
     { 
       label: 'Perfil Completo', 
-      value: '85%', 
+      value: `${stats?.profileCompleteness || 0}%`, 
       icon: 'pi-user', 
       color: 'purple',
       action: () => navigate('/candidate/profile')
     }
   ]
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-content-center align-items-center" style={{ height: '50vh' }}>
-        <i className="pi pi-spinner pi-spin text-4xl text-primary"></i>
-      </div>
-    )
-  }
-
   return (
     <div className="grid">
       <div className="col-12">
-        <Card>
+        <Card className="card-modern">
           <div className="flex justify-content-between align-items-center mb-4">
             <div>
               <h1 className="text-3xl font-bold text-900 m-0">Dashboard</h1>
@@ -65,6 +58,7 @@ export const CandidateDashboard = () => {
             <Button
               label="Buscar Vagas"
               icon="pi pi-search"
+              className="btn-gradient"
               onClick={() => navigate('/')}
             />
           </div>
@@ -72,25 +66,29 @@ export const CandidateDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      {statsCards.map((stat, index) => (
-        <div key={index} className="col-12 md:col-6 lg:col-3">
-          <Card className="cursor-pointer hover:shadow-4 transition-all transition-duration-200" onClick={stat.action}>
-            <div className="flex justify-content-between align-items-center">
-              <div>
-                <div className="text-500 font-medium mb-2">{stat.label}</div>
-                <div className="text-900 font-bold text-xl">{stat.value}</div>
+      {statsLoading ? (
+        <LoadingSkeleton type="stats" count={4} />
+      ) : (
+        statsCards.map((stat, index) => (
+          <div key={index} className="col-12 md:col-6 lg:col-3">
+            <Card className="card-modern cursor-pointer hover-lift" onClick={stat.action}>
+              <div className="flex justify-content-between align-items-center">
+                <div>
+                  <div className="text-500 font-medium mb-2">{stat.label}</div>
+                  <div className="text-900 font-bold text-xl">{stat.value}</div>
+                </div>
+                <div className={`border-round inline-flex justify-content-center align-items-center bg-${stat.color}-100 text-${stat.color}-600`} style={{ width: '2.5rem', height: '2.5rem' }}>
+                  <i className={`pi ${stat.icon} text-xl`}></i>
+                </div>
               </div>
-              <div className={`border-round inline-flex justify-content-center align-items-center bg-${stat.color}-100 text-${stat.color}-600`} style={{ width: '2.5rem', height: '2.5rem' }}>
-                <i className={`pi ${stat.icon} text-xl`}></i>
-              </div>
-            </div>
-          </Card>
-        </div>
-      ))}
+            </Card>
+          </div>
+        ))
+      )}
 
       {/* Quick Actions */}
       <div className="col-12 md:col-8">
-        <Card title="Ações Rápidas">
+        <Card title="Ações Rápidas" className="card-modern">
           <div className="grid">
             <div className="col-12 md:col-6">
               <Button
@@ -130,23 +128,19 @@ export const CandidateDashboard = () => {
 
       {/* Applications Status */}
       <div className="col-12 md:col-4">
-        <Card title="Status das Candidaturas">
+        <Card title="Status das Candidaturas" className="card-modern">
           <div className="flex flex-column gap-3">
             <div className="flex justify-content-between align-items-center">
               <span className="text-600">Pendentes</span>
-              <span className="text-900 font-semibold">{stats.pending}</span>
-            </div>
-            <div className="flex justify-content-between align-items-center">
-              <span className="text-600">Em Análise</span>
-              <span className="text-900 font-semibold">{stats.interview}</span>
+              <span className="text-900 font-semibold">{stats?.pendingApplications || 0}</span>
             </div>
             <div className="flex justify-content-between align-items-center">
               <span className="text-600">Aprovadas</span>
-              <span className="text-900 font-semibold">{stats.approved}</span>
+              <span className="text-900 font-semibold">{stats?.approvedApplications || 0}</span>
             </div>
             <div className="flex justify-content-between align-items-center">
               <span className="text-600">Rejeitadas</span>
-              <span className="text-900 font-semibold">{stats.rejected}</span>
+              <span className="text-900 font-semibold">{stats?.rejectedApplications || 0}</span>
             </div>
           </div>
         </Card>
@@ -154,20 +148,21 @@ export const CandidateDashboard = () => {
 
       {/* Recent Activity */}
       <div className="col-12">
-        <Card title="Candidaturas Recentes">
+        <Card title="Candidaturas Recentes" className="card-modern">
           {applications.length === 0 ? (
             <div className="text-center p-4">
-              <i className="pi pi-briefcase text-4xl text-400 mb-3"></i>
+              <i className="pi pi-send text-4xl text-primary-300 mb-3"></i>
               <p className="text-600 mb-4">Você ainda não se candidatou a nenhuma vaga</p>
               <Button
                 label="Buscar Vagas"
                 icon="pi pi-search"
+                className="btn-gradient"
                 onClick={() => navigate('/')}
               />
             </div>
           ) : (
             <div className="timeline">
-              {applications.slice(0, 5).map((application, index) => (
+              {applications.slice(0, 5).map((application) => (
                 <div key={application.id} className="timeline-item">
                   <div className={`timeline-marker bg-${
                     application.status === 'APPROVED' ? 'green' :
