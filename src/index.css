@@ -33,11 +33,20 @@ body {
 .layout-main {
   flex: 1;
   padding: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
   .layout-main {
-    padding: 2rem;
+    padding: 1.5rem 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .layout-main {
+    padding: 2rem 3rem;
   }
 }
 

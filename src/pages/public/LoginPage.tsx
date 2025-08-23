@@ -34,12 +34,14 @@ export const LoginPage = () => {
   }
 
   return (
-    <div className="flex align-items-center justify-content-center min-h-screen p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-4">
-          <i className="pi pi-briefcase text-4xl text-primary mb-3"></i>
-          <h1 className="text-2xl font-bold text-900 mb-2">Portal de Vagas</h1>
-          <p className="text-600">Entre na sua conta</p>
+    <div className="auth-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <div className="auth-logo">
+            <i className="pi pi-briefcase"></i>
+          </div>
+          <h1 className="auth-title">Portal de Vagas</h1>
+          <p className="auth-subtitle">Entre na sua conta para continuar</p>
         </div>
 
         <DynamicForm
@@ -48,13 +50,14 @@ export const LoginPage = () => {
           onSubmit={handleSubmit}
           loading={loginLoading}
           submitLabel="Entrar"
+          variant="auth"
         />
 
-        <div className="text-center mt-4">
-          <p className="text-600">
+        <div className="auth-footer">
+          <p className="text-600 text-sm">
             Não tem conta?{' '}
-            <Link to="/register" className="text-primary font-semibold no-underline">
-              Cadastre-se
+            <Link to="/register" className="auth-link">
+              Cadastre-se gratuitamente
             </Link>
           </p>
         </div>

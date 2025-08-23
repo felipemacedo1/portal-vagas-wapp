@@ -1,20 +1,20 @@
 /* Portal de Vagas - Custom Theme */
 :root {
-  /* Brand Colors */
-  --primary-50: #f0f9ff;
-  --primary-100: #e0f2fe;
-  --primary-200: #bae6fd;
-  --primary-300: #7dd3fc;
-  --primary-400: #38bdf8;
-  --primary-500: #0ea5e9;
-  --primary-600: #0284c7;
-  --primary-700: #0369a1;
-  --primary-800: #075985;
-  --primary-900: #0c4a6e;
+  /* Brand Colors - Professional Blue */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
 
   /* Success Colors */
-  --success-500: #22c55e;
-  --success-600: #16a34a;
+  --success-500: #10b981;
+  --success-600: #059669;
 
   /* Warning Colors */
   --warning-500: #f59e0b;
@@ -27,50 +27,156 @@
   /* Neutral Colors */
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
   --gray-600: #4b5563;
+  --gray-700: #374151;
   --gray-900: #111827;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+
+  /* Spacing */
+  --content-padding: 1.5rem;
+  --section-gap: 2rem;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, var(--gray-50) 0%, var(--primary-50) 100%);
+  background: var(--gray-50);
   min-height: 100vh;
+  line-height: 1.6;
 }
 
+/* Layout Containers */
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.section-container {
+  margin-bottom: var(--section-gap);
+}
+
+.grid-container {
+  display: grid;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+/* Card Styles */
 .card-modern {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  padding: var(--content-padding);
 }
 
 .card-modern:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-200);
 }
 
+.card-compact {
+  padding: 1rem;
+}
+
+/* Button Styles */
 .btn-gradient {
-  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+  background: var(--primary-600);
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .btn-gradient:hover {
-  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+  background: var(--primary-700);
   transform: translateY(-1px);
 }
 
+/* Text Styles */
 .text-gradient {
-  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-800) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-700);
+  font-weight: 600;
+}
+
+/* Component Overrides */
+.p-card {
+  margin-bottom: 1rem;
+}
+
+.p-card .p-card-body {
+  padding: 1.25rem;
+}
+
+.p-card .p-card-content {
+  padding: 0;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+}
+
+.p-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.p-button.p-button-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+}
+
+/* Form Improvements */
+.p-inputtext, .p-dropdown, .p-multiselect {
+  border-radius: 6px;
+}
+
+.p-field {
+  margin-bottom: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 0 0.75rem;
+  }
+  
+  .card-modern {
+    padding: 1rem;
+  }
+  
+  .p-card .p-card-body {
+    padding: 1rem;
+  }
+}
+
+/* Utility Classes */
+.compact-spacing > * {
+  margin-bottom: 0.75rem !important;
+}
+
+.tight-grid {
+  gap: 1rem !important;
+}
+
+.max-width-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.max-width-content {
+  max-width: 800px;
+  margin: 0 auto;
 }

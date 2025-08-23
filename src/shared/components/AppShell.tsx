@@ -177,8 +177,12 @@ export const AppShell = ({ children }: AppShellProps) => {
       )}
       
       <main className="layout-main">
-        <Breadcrumbs />
-        {children}
+        <div className="content-container">
+          <Breadcrumbs />
+          <div className="section-container">
+            {children}
+          </div>
+        </div>
       </main>
     </div>
   )

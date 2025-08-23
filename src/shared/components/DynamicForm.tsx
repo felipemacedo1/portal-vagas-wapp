@@ -13,9 +13,9 @@ import type { ZodSchema } from 'zod'
 interface FormField {
   name: string
   label: string
-  type: 'text' | 'email' | 'password' | 'textarea' | 'select' | 'checkbox' | 'number'
+  type: 'text' | 'email' | 'password' | 'textarea' | 'select' | 'checkbox' | 'number' | 'role-selector'
   placeholder?: string
-  options?: { label: string; value: any }[]
+  options?: { label: string; value: any; icon?: string; description?: string }[]
   required?: boolean
   disabled?: boolean
   rows?: number
@@ -29,6 +29,7 @@ interface DynamicFormProps {
   submitLabel?: string
   title?: string
   defaultValues?: Record<string, any>
+  variant?: 'default' | 'auth'
 }
 
 export const DynamicForm = ({
@@ -38,7 +39,8 @@ export const DynamicForm = ({
   loading = false,
   submitLabel = 'Salvar',
   title,
-  defaultValues = {}
+  defaultValues = {},
+  variant = 'default'
 }: DynamicFormProps) => {
   const {
     control,
@@ -57,7 +59,11 @@ export const DynamicForm = ({
       id: field.name,
       placeholder: field.placeholder,
       disabled: field.disabled || loading,
-      className: classNames('w-full', { 'p-invalid': hasError })
+      className: classNames(
+        'w-full',
+        { 'p-invalid': hasError },
+        { 'auth-input': variant === 'auth' }
+      )
     }
 
     switch (field.type) {
@@ -90,6 +96,31 @@ export const DynamicForm = ({
                 onChange={(e) => onChange(e.target.value)}
                 rows={field.rows || 3}
               />
+            )}
+          />
+        )
+
+      case 'role-selector':
+        return (
+          <Controller
+            name={field.name}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <div className="role-selector">
+                {field.options?.map((option) => (
+                  <div
+                    key={option.value}
+                    className={classNames('role-option', {
+                      selected: value === option.value
+                    })}
+                    onClick={() => onChange(option.value)}
+                  >
+                    <i className={`pi ${option.icon}`}></i>
+                    <div className="role-title">{option.label}</div>
+                    <div className="role-desc">{option.description}</div>
+                  </div>
+                ))}
+              </div>
             )}
           />
         )
@@ -163,6 +194,46 @@ export const DynamicForm = ({
           />
         )
     }
+  }
+
+  if (variant === 'auth') {
+    return (
+      <form onSubmit={handleSubmit(onSubmit)} className="auth-form">
+        {fields.map((field) => (
+          <div key={field.name} className="auth-field">
+            {field.type !== 'checkbox' && field.type !== 'role-selector' && (
+              <label htmlFor={field.name} className="auth-label">
+                {field.label}
+                {field.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
+            )}
+            
+            {field.type === 'role-selector' && (
+              <label className="auth-label">
+                {field.label}
+                {field.required && <span className="text-red-500 ml-1">*</span>}
+              </label>
+            )}
+            
+            {renderField(field)}
+            
+            {errors[field.name] && (
+              <div className="auth-error">
+                <i className="pi pi-exclamation-circle"></i>
+                {errors[field.name]?.message as string}
+              </div>
+            )}
+          </div>
+        ))}
+
+        <Button
+          type="submit"
+          label={submitLabel}
+          loading={loading}
+          className="auth-submit w-full"
+        />
+      </form>
+    )
   }
 
   return (
