@@ -3,9 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Card } from 'primereact/card'
 import { Button } from 'primereact/button'
 import { Badge } from 'primereact/badge'
-import { Chip } from 'primereact/chip'
+import { Tag } from 'primereact/tag'
 import { Divider } from 'primereact/divider'
+import { Message } from 'primereact/message'
 import { ApplyJobModal } from '../../shared/components/ApplyJobModal'
+import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
 import { useAuthStore } from '../../core/stores/authStore'
 import { useJob } from '../../hooks/useJobs'
 
@@ -15,29 +17,11 @@ export const JobDetailsPage = () => {
   const { user, isAuthenticated } = useAuthStore()
   const [applyModalVisible, setApplyModalVisible] = useState(false)
 
-  // Mock data - will be replaced with useJob hook
-  const job = {
-    id: Number(id),
-    title: 'Desenvolvedor React Sênior',
-    description: 'Estamos procurando um desenvolvedor React experiente para se juntar ao nosso time de tecnologia. Você será responsável por desenvolver interfaces modernas e responsivas, trabalhar com APIs REST e colaborar com designers e product managers.',
-    requirements: 'Experiência com React, TypeScript, Next.js, Styled Components, Git, metodologias ágeis. Desejável: Node.js, GraphQL, testes automatizados.',
-    location: 'São Paulo, SP',
-    remote: true,
-    salaryMin: 8000,
-    salaryMax: 12000,
-    type: 'FULL_TIME',
-    status: 'APPROVED',
-    company: {
-      id: 1,
-      name: 'TechCorp Solutions',
-      description: 'Empresa líder em soluções tecnológicas',
-      verified: true
-    },
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-16T14:30:00Z'
-  }
+  const { data: job, isLoading, error, refetch } = useJob(id!)
 
   const formatSalary = () => {
+    if (!job) return 'Salário a combinar'
+    
     if (job.salaryMin && job.salaryMax) {
       return `R$ ${job.salaryMin.toLocaleString()} - R$ ${job.salaryMax.toLocaleString()}`
     }
@@ -48,6 +32,8 @@ export const JobDetailsPage = () => {
   }
 
   const getJobType = () => {
+    if (!job) return ''
+    
     const types = {
       FULL_TIME: 'Tempo Integral',
       PART_TIME: 'Meio Período',
@@ -72,12 +58,70 @@ export const JobDetailsPage = () => {
 
   const canApply = isAuthenticated && user?.role === 'CANDIDATE'
 
+  if (isLoading) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="grid">
+          <div className="col-12 lg:col-8">
+            <LoadingSkeleton type="card" count={1} />
+          </div>
+          <div className="col-12 lg:col-4">
+            <LoadingSkeleton type="stats" count={2} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <Card className="text-center">
+          <i className="pi pi-exclamation-triangle text-4xl text-orange-500 mb-3"></i>
+          <h2 className="text-2xl font-bold text-900 mb-2">Erro ao carregar vaga</h2>
+          <p className="text-600 mb-4">
+            Não foi possível carregar os detalhes desta vaga.
+          </p>
+          <div className="flex gap-2 justify-content-center">
+            <Button
+              label="Tentar Novamente"
+              onClick={() => refetch()}
+            />
+            <Button
+              label="Voltar às Vagas"
+              className="p-button-outlined"
+              onClick={() => navigate('/')}
+            />
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
+  if (!job) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <Card className="text-center">
+          <i className="pi pi-search text-4xl text-400 mb-3"></i>
+          <h2 className="text-2xl font-bold text-900 mb-2">Vaga não encontrada</h2>
+          <p className="text-600 mb-4">
+            A vaga que você está procurando não existe ou foi removida.
+          </p>
+          <Button
+            label="Ver Outras Vagas"
+            onClick={() => navigate('/')}
+          />
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
       <div className="grid">
         {/* Main Content */}
         <div className="col-12 lg:col-8">
-          <Card>
+          <Card className="card-modern">
             <div className="flex flex-column gap-4">
               {/* Header */}
               <div className="flex justify-content-between align-items-start">
@@ -97,6 +141,7 @@ export const JobDetailsPage = () => {
                     label="Candidatar-se"
                     icon="pi pi-send"
                     size="large"
+                    className="btn-gradient"
                     onClick={handleApply}
                   />
                 )}
@@ -104,12 +149,12 @@ export const JobDetailsPage = () => {
 
               {/* Job Info */}
               <div className="flex flex-wrap gap-2">
-                <Chip label={getJobType()} icon="pi pi-briefcase" />
-                <Chip 
-                  label={job.remote ? 'Remoto' : job.location} 
+                <Tag value={getJobType()} icon="pi pi-briefcase" />
+                <Tag 
+                  value={job.remote ? 'Remoto' : job.location} 
                   icon={job.remote ? 'pi pi-globe' : 'pi pi-map-marker'} 
                 />
-                <Chip label={formatSalary()} icon="pi pi-dollar" />
+                <Tag value={formatSalary()} icon="pi pi-dollar" />
               </div>
 
               <Divider />
@@ -141,6 +186,7 @@ export const JobDetailsPage = () => {
                         <p className="text-600 mb-3">Faça login para se candidatar a esta vaga</p>
                         <Button
                           label="Fazer Login"
+                          className="btn-gradient"
                           onClick={() => navigate('/login')}
                         />
                       </div>
@@ -160,7 +206,7 @@ export const JobDetailsPage = () => {
         <div className="col-12 lg:col-4">
           <div className="flex flex-column gap-4">
             {/* Company Info */}
-            <Card title="Sobre a Empresa">
+            <Card title="Sobre a Empresa" className="card-modern">
               <div className="flex flex-column gap-3">
                 <div className="flex align-items-center gap-2">
                   <i className="pi pi-building text-600"></i>
@@ -180,7 +226,7 @@ export const JobDetailsPage = () => {
             </Card>
 
             {/* Job Details */}
-            <Card title="Detalhes da Vaga">
+            <Card title="Detalhes da Vaga" className="card-modern">
               <div className="flex flex-column gap-3">
                 <div className="flex justify-content-between">
                   <span className="text-600">Localização:</span>
@@ -208,23 +254,6 @@ export const JobDetailsPage = () => {
                     {new Date(job.createdAt).toLocaleDateString('pt-BR')}
                   </span>
                 </div>
-              </div>
-            </Card>
-
-            {/* Share */}
-            <Card title="Compartilhar">
-              <div className="flex gap-2">
-                <Button
-                  icon="pi pi-copy"
-                  className="p-button-outlined flex-1"
-                  tooltip="Copiar Link"
-                  onClick={() => navigator.clipboard.writeText(window.location.href)}
-                />
-                <Button
-                  icon="pi pi-bookmark"
-                  className="p-button-outlined flex-1"
-                  tooltip="Salvar Vaga"
-                />
               </div>
             </Card>
           </div>
