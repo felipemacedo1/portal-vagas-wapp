@@ -2,7 +2,7 @@ import { Menubar } from 'primereact/menubar'
 import { Button } from 'primereact/button'
 import { Avatar } from 'primereact/avatar'
 import { Badge } from 'primereact/badge'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../shared/hooks/useAuth'
 
 interface HeaderProps {
@@ -12,7 +12,6 @@ interface HeaderProps {
 export const Header = ({ onMenuToggle }: HeaderProps) => {
   const { user, logout, isAuthenticated } = useAuth()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const getMenuItems = () => {
     const baseItems = [
@@ -20,7 +19,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
         label: 'Vagas',
         icon: 'pi pi-briefcase',
         command: () => navigate('/'),
-        className: location.pathname === '/' ? 'p-menuitem-active' : ''
+        className: 'font-semibold'
       }
     ]
 
@@ -39,7 +38,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             label: 'Candidaturas',
             icon: 'pi pi-send',
             command: () => navigate('/candidate/applications'),
-            badge: '3' // Mock notification count
+            badge: '3'
           }
         ]
 
@@ -60,7 +59,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             label: 'Candidaturas',
             icon: 'pi pi-users',
             command: () => navigate('/employer/applications'),
-            badge: '5' // Mock notification count
+            badge: '5'
           }
         ]
 
@@ -76,7 +75,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             label: 'Moderar',
             icon: 'pi pi-check-circle',
             command: () => navigate('/admin/jobs'),
-            badge: '8' // Mock pending count
+            badge: '8'
           }
         ]
 
@@ -94,13 +93,14 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
           onClick={onMenuToggle}
         />
       )}
-      <i className="pi pi-briefcase text-2xl text-primary mr-2"></i>
-      <span 
-        className="text-xl font-bold text-primary cursor-pointer" 
-        onClick={() => navigate('/')}
-      >
-        Portal de Vagas
-      </span>
+      <div className="flex align-items-center cursor-pointer" onClick={() => navigate('/')}>
+        <div className="w-2rem h-2rem bg-primary-500 border-round flex align-items-center justify-content-center mr-2">
+          <i className="pi pi-briefcase text-white text-lg"></i>
+        </div>
+        <span className="text-xl font-bold text-gradient">
+          Portal de Vagas
+        </span>
+      </div>
     </div>
   )
 
@@ -108,12 +108,12 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
     <div className="flex align-items-center gap-2">
       {isAuthenticated ? (
         <>
-          <div className="hidden md:flex align-items-center gap-2 mr-3">
+          <div className="hidden md:flex align-items-center gap-2 mr-3 p-2 border-round-lg bg-primary-50">
             <Avatar 
               icon="pi pi-user" 
               shape="circle" 
               size="normal"
-              className="cursor-pointer"
+              className="bg-primary-500 text-white cursor-pointer"
               onClick={() => {
                 const dashboardPath = user?.role === 'ADMIN' ? '/admin' : 
                                      user?.role === 'EMPLOYER' ? '/employer' : '/candidate'
@@ -122,7 +122,10 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             />
             <div className="flex flex-column">
               <span className="text-sm font-semibold text-900">{user?.email}</span>
-              <span className="text-xs text-500 capitalize">{user?.role.toLowerCase()}</span>
+              <div className="flex align-items-center gap-1">
+                <span className="text-xs text-500 capitalize">{user?.role.toLowerCase()}</span>
+                <div className="w-0-5rem h-0-5rem bg-success-500 border-round-3xl"></div>
+              </div>
             </div>
           </div>
           
@@ -137,11 +140,12 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
         <>
           <Button 
             label="Entrar" 
-            className="p-button-text" 
+            className="p-button-text font-semibold" 
             onClick={() => navigate('/login')}
           />
           <Button 
             label="Cadastrar" 
+            className="btn-gradient"
             onClick={() => navigate('/register')}
           />
         </>
@@ -154,7 +158,8 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
       model={getMenuItems()} 
       start={start} 
       end={end}
-      className="border-none border-round-none shadow-2"
+      className="border-none shadow-2 bg-white"
+      style={{ borderRadius: '0' }}
     />
   )
 }

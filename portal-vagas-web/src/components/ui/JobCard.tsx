@@ -50,58 +50,28 @@ export const JobCard = ({ job }: JobCardProps) => {
   const canApply = isAuthenticated && user?.role === 'CANDIDATE'
 
   const header = (
-    <div className="flex justify-content-between align-items-start mb-2">
+    <div className="flex justify-content-between align-items-start mb-3">
       <div className="flex align-items-center gap-2">
-        <i className="pi pi-building text-600"></i>
-        <span className="text-600 text-sm">{job.company.name}</span>
-        {job.company.verified && (
-          <Badge value="Verificada" severity="success" />
-        )}
-      </div>
-      {job.remote && (
-        <Tag value="Remoto" severity="info" />
-      )}
-    </div>
-  )
-
-  const footer = (
-    <div className="flex justify-content-between align-items-center">
-      <div className="flex flex-column gap-1">
-        <div className="flex align-items-center gap-1">
-          <i className="pi pi-map-marker text-600 text-sm"></i>
-          <span className="text-600 text-sm">{job.location}</span>
+        <div className="w-3rem h-3rem bg-primary-100 border-round flex align-items-center justify-content-center">
+          <i className="pi pi-building text-primary-600 text-lg"></i>
         </div>
-        <div className="flex align-items-center gap-1">
-          <i className="pi pi-calendar text-600 text-sm"></i>
-          <span className="text-600 text-sm">
-            {new Date(job.createdAt).toLocaleDateString('pt-BR')}
-          </span>
+        <div>
+          <div className="font-semibold text-900">{job.company.name}</div>
+          <div className="flex align-items-center gap-1">
+            {job.company.verified && (
+              <Badge value="Verificada" severity="success" />
+            )}
+            {job.remote && (
+              <Tag value="Remoto" severity="info" className="text-xs" />
+            )}
+          </div>
         </div>
       </div>
       
-      <div className="flex gap-2">
-        <Button 
-          label="Detalhes" 
-          size="small"
-          className="p-button-outlined"
-          onClick={handleViewDetails}
-        />
-        
-        {canApply ? (
-          <Button 
-            label="Candidatar-se" 
-            size="small"
-            icon="pi pi-send"
-            onClick={handleApply}
-          />
-        ) : !isAuthenticated ? (
-          <Button 
-            label="Login" 
-            size="small"
-            className="p-button-outlined"
-            onClick={handleApply}
-          />
-        ) : null}
+      <div className="text-right">
+        <div className="text-xs text-500">
+          {new Date(job.createdAt).toLocaleDateString('pt-BR')}
+        </div>
       </div>
     </div>
   )
@@ -110,25 +80,68 @@ export const JobCard = ({ job }: JobCardProps) => {
     <>
       <Card 
         header={header}
-        footer={footer}
-        className="h-full cursor-pointer hover:shadow-4 transition-all transition-duration-200"
+        className="card-modern hover-lift cursor-pointer h-full"
         onClick={handleViewDetails}
       >
-        <div className="flex flex-column gap-3">
-          <h3 className="m-0 text-xl font-semibold text-900">{job.title}</h3>
-          
-          <div className="text-primary font-semibold text-lg">
-            {formatSalary()}
+        <div className="flex flex-column gap-3 h-full">
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-900 mb-2 line-height-3">{job.title}</h3>
+            
+            <div className="text-primary-600 font-semibold text-lg mb-3">
+              {formatSalary()}
+            </div>
+            
+            <p className="text-600 line-height-3 m-0" style={{ 
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden'
+            }}>
+              {job.description}
+            </p>
           </div>
           
-          <p className="text-600 m-0 line-height-3" style={{ 
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}>
-            {job.description}
-          </p>
+          <div className="flex flex-column gap-3">
+            <div className="flex align-items-center gap-2 text-sm text-500">
+              <i className="pi pi-map-marker"></i>
+              <span>{job.location}</span>
+              {job.remote && (
+                <>
+                  <span>•</span>
+                  <span>Trabalho Remoto</span>
+                </>
+              )}
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                label="Ver Detalhes" 
+                size="small"
+                className="p-button-outlined flex-1"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleViewDetails()
+                }}
+              />
+              
+              {canApply ? (
+                <Button 
+                  label="Candidatar-se" 
+                  size="small"
+                  icon="pi pi-send"
+                  className="btn-gradient flex-1"
+                  onClick={handleApply}
+                />
+              ) : !isAuthenticated ? (
+                <Button 
+                  label="Fazer Login" 
+                  size="small"
+                  className="p-button-outlined flex-1"
+                  onClick={handleApply}
+                />
+              ) : null}
+            </div>
+          </div>
         </div>
       </Card>
 
