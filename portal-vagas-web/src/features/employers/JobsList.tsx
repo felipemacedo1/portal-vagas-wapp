@@ -2,49 +2,21 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from 'primereact/button'
 import { Badge } from 'primereact/badge'
+import { Card } from 'primereact/card'
+import { Message } from 'primereact/message'
 import { ConfirmDialog } from 'primereact/confirmdialog'
 import { DataTable } from '../../shared/components/DataTable'
+import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
+import { useEmployerJobs } from '../../hooks/useJobs'
 import { useToast } from '../../core/providers/ToastProvider'
 
 export const JobsList = () => {
   const navigate = useNavigate()
-  const { showSuccess, showError } = useToast()
+  const { showSuccess } = useToast()
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [selectedJob, setSelectedJob] = useState<any>(null)
 
-  // Mock data - will be replaced with API call
-  const jobs = [
-    {
-      id: 1,
-      title: 'Desenvolvedor React Sênior',
-      location: 'São Paulo, SP',
-      remote: true,
-      status: 'APPROVED',
-      applications: 12,
-      createdAt: '2024-01-15T10:00:00Z',
-      updatedAt: '2024-01-16T14:30:00Z'
-    },
-    {
-      id: 2,
-      title: 'Designer UX/UI',
-      location: 'Rio de Janeiro, RJ',
-      remote: false,
-      status: 'PENDING',
-      applications: 0,
-      createdAt: '2024-01-10T09:00:00Z',
-      updatedAt: '2024-01-10T09:00:00Z'
-    },
-    {
-      id: 3,
-      title: 'Product Manager',
-      location: 'Belo Horizonte, MG',
-      remote: true,
-      status: 'DRAFT',
-      applications: 0,
-      createdAt: '2024-01-08T16:00:00Z',
-      updatedAt: '2024-01-12T11:00:00Z'
-    }
-  ]
+  const { data, isLoading, error, refetch } = useEmployerJobs(0, 20)
 
   const getStatusBadge = (status: string) => {
     const config = {
@@ -82,12 +54,12 @@ export const JobsList = () => {
       body: (rowData: any) => getStatusBadge(rowData.status)
     },
     {
-      field: 'applications',
+      field: 'applicationsCount',
       header: 'Candidaturas',
       sortable: true,
       body: (rowData: any) => (
         <div className="text-center">
-          <span className="font-semibold">{rowData.applications}</span>
+          <span className="font-semibold">{rowData.applicationsCount || 0}</span>
         </div>
       )
     },
@@ -108,7 +80,7 @@ export const JobsList = () => {
   }
 
   const handleSubmit = (job: any) => {
-    // TODO: Integrate with API
+    // TODO: Implement submit job
     console.log('Submitting job:', job.id)
     showSuccess('Vaga enviada para aprovação!')
   }
@@ -119,7 +91,7 @@ export const JobsList = () => {
   }
 
   const confirmDelete = () => {
-    // TODO: Integrate with API
+    // TODO: Implement delete job
     console.log('Deleting job:', selectedJob.id)
     showSuccess('Vaga excluída com sucesso!')
     setConfirmVisible(false)
@@ -157,6 +129,45 @@ export const JobsList = () => {
     </div>
   )
 
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-900 m-0">Minhas Vagas</h1>
+            <p className="text-600 m-0">Gerencie suas vagas publicadas</p>
+          </div>
+        </div>
+        <LoadingSkeleton type="table" count={5} />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div>
+        <div className="flex justify-content-between align-items-center mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-900 m-0">Minhas Vagas</h1>
+            <p className="text-600 m-0">Gerencie suas vagas publicadas</p>
+          </div>
+        </div>
+        <Card>
+          <Message 
+            severity="error" 
+            text="Erro ao carregar vagas. Tente novamente." 
+          />
+          <div className="text-center mt-3">
+            <Button
+              label="Tentar Novamente"
+              onClick={() => refetch()}
+            />
+          </div>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="flex justify-content-between align-items-center mb-4">
@@ -167,17 +178,34 @@ export const JobsList = () => {
         <Button
           label="Nova Vaga"
           icon="pi pi-plus"
+          className="btn-gradient"
           onClick={() => navigate('/employer/jobs/new')}
         />
       </div>
 
-      <DataTable
-        data={jobs}
-        columns={columns}
-        actions={getActions}
-        exportable
-        onExport={() => console.log('Exporting jobs...')}
-      />
+      {!data?.content || data.content.length === 0 ? (
+        <Card className="card-modern text-center p-6">
+          <i className="pi pi-briefcase text-4xl text-primary-300 mb-4"></i>
+          <h3 className="text-900 mb-3">Nenhuma vaga criada ainda</h3>
+          <p className="text-600 mb-4">
+            Comece criando sua primeira vaga para atrair candidatos qualificados
+          </p>
+          <Button
+            label="Criar Primeira Vaga"
+            icon="pi pi-plus"
+            className="btn-gradient"
+            onClick={() => navigate('/employer/jobs/new')}
+          />
+        </Card>
+      ) : (
+        <DataTable
+          data={data.content}
+          columns={columns}
+          actions={getActions}
+          exportable
+          onExport={() => console.log('Exporting jobs...')}
+        />
+      )}
 
       <ConfirmDialog
         visible={confirmVisible}
