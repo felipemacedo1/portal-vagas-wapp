@@ -1,5 +1,6 @@
 import { api } from './api'
-import type { Job, JobFilters, PageResponse, Application } from '../types/entities'
+import type { Job, PageResponse, Application } from '../types/entities'
+import type { JobFilters } from '../types/jobs'
 
 export const jobsService = {
   // Public endpoints
@@ -12,86 +13,86 @@ export const jobsService = {
     if (filters.page !== undefined) params.append('page', filters.page.toString())
     if (filters.size !== undefined) params.append('size', filters.size.toString())
     
-    const response = await api.get(`/jobs/public?${params}`)
+    const response = await api.get(`/api/jobs/public?${params}`)
     return response.data
   },
 
   async getPublicJob(id: string): Promise<Job> {
-    const response = await api.get(`/jobs/public/${id}`)
+    const response = await api.get(`/api/jobs/public/${id}`)
     return response.data
   },
 
   // Candidate endpoints
   async applyToJob(jobId: number, data?: { coverLetter?: string }): Promise<Application> {
-    const response = await api.post(`/candidates/applications?jobId=${jobId}`, data)
+    const response = await api.post(`/api/candidates/applications?jobId=${jobId}`, data)
     return response.data
   },
 
   async getCandidateApplications(page = 0, size = 10): Promise<PageResponse<Application>> {
-    const response = await api.get(`/candidates/applications?page=${page}&size=${size}`)
+    const response = await api.get(`/api/candidates/applications?page=${page}&size=${size}`)
     return response.data
   },
 
   // Employer endpoints
   async getEmployerJobs(page = 0, size = 10): Promise<PageResponse<Job>> {
-    const response = await api.get(`/jobs?page=${page}&size=${size}`)
+    const response = await api.get(`/api/jobs?page=${page}&size=${size}`)
     return response.data
   },
 
   async createJob(jobData: Partial<Job>): Promise<Job> {
-    const response = await api.post('/jobs', jobData)
+    const response = await api.post('/api/jobs', jobData)
     return response.data
   },
 
   async updateJob(id: number, jobData: Partial<Job>): Promise<Job> {
-    const response = await api.put(`/jobs/${id}`, jobData)
+    const response = await api.put(`/api/jobs/${id}`, jobData)
     return response.data
   },
 
   async deleteJob(id: number): Promise<void> {
-    await api.delete(`/jobs/${id}`)
+    await api.delete(`/api/jobs/${id}`)
   },
 
   async submitJob(id: number): Promise<Job> {
-    const response = await api.post(`/jobs/${id}/submit`)
+    const response = await api.post(`/api/jobs/${id}/submit`)
     return response.data
   },
 
   async getEmployerApplications(page = 0, size = 10): Promise<PageResponse<Application>> {
-    const response = await api.get(`/jobs/applications?page=${page}&size=${size}`)
+    const response = await api.get(`/api/jobs/applications?page=${page}&size=${size}`)
     return response.data
   },
 
   async updateApplicationStatus(applicationId: number, status: string): Promise<Application> {
-    const response = await api.put(`/jobs/applications/${applicationId}/status`, { status })
+    const response = await api.put(`/api/jobs/applications/${applicationId}/status`, { status })
     return response.data
   },
 
   // Admin endpoints
   async getPendingJobs(page = 0, size = 10): Promise<PageResponse<Job>> {
-    const response = await api.get(`/admin/jobs/pending?page=${page}&size=${size}`)
+    const response = await api.get(`/api/admin/jobs/pending?page=${page}&size=${size}`)
     return response.data
   },
 
   async approveJob(id: number): Promise<Job> {
-    const response = await api.post(`/admin/jobs/${id}/approve`)
+    const response = await api.post(`/api/admin/jobs/${id}/approve`)
     return response.data
   },
 
   async rejectJob(id: number, reason?: string): Promise<Job> {
-    const response = await api.post(`/admin/jobs/${id}/reject`, { reason })
+    const response = await api.post(`/api/admin/jobs/${id}/reject`, { reason })
     return response.data
   },
 
   // Company endpoints
   async getCompany(id: string): Promise<any> {
-    const response = await api.get(`/companies/${id}`)
+    const response = await api.get(`/api/companies/${id}`)
     return response.data
   },
 
   // Statistics
   async getDashboardStats(): Promise<any> {
-    const response = await api.get('/dashboard/stats')
+    const response = await api.get('/api/dashboard/stats')
     return response.data
   }
 }

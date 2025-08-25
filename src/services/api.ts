@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { authService } from './auth'
 
-const API_BASE_URL = 'http://localhost:8081'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,10 +12,10 @@ export const api = axios.create({
 
 // Lista de endpoints públicos que não precisam de token
 const publicEndpoints = [
-  '/jobs/public',
-  '/auth/login',
-  '/auth/register',
-  '/auth/refresh'
+  '/api/jobs/public',
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/refresh'
 ]
 
 // Request interceptor para adicionar token apenas quando necessário

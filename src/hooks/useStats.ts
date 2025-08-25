@@ -8,7 +8,7 @@ export const useCandidateStats = () => {
   return useQuery({
     queryKey: ['stats', 'candidate'],
     queryFn: async () => {
-      const response = await api.get('/dashboard/stats/candidate')
+      const response = await api.get('/api/dashboard/stats/candidate')
       return response.data
     },
     enabled: user?.role === 'CANDIDATE',
@@ -22,7 +22,7 @@ export const useEmployerStats = () => {
   return useQuery({
     queryKey: ['stats', 'employer'],
     queryFn: async () => {
-      const response = await api.get('/dashboard/stats/employer')
+      const response = await api.get('/api/dashboard/stats/employer')
       return response.data
     },
     enabled: user?.role === 'EMPLOYER',
@@ -36,7 +36,7 @@ export const useAdminStats = () => {
   return useQuery({
     queryKey: ['stats', 'admin'],
     queryFn: async () => {
-      const response = await api.get('/dashboard/stats/admin')
+      const response = await api.get('/api/dashboard/stats/admin')
       return response.data
     },
     enabled: user?.role === 'ADMIN',
