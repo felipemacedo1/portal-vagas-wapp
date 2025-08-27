@@ -13,12 +13,12 @@ export const jobsService = {
     if (filters.page !== undefined) params.append('page', filters.page.toString())
     if (filters.size !== undefined) params.append('size', filters.size.toString())
     
-    const response = await api.get(`/api/jobs/public?${params}`)
+    const response = await api.get(`/api/public/jobs?${params}`)
     return response.data
   },
 
   async getPublicJob(id: string): Promise<Job> {
-    const response = await api.get(`/api/jobs/public/${id}`)
+    const response = await api.get(`/api/public/jobs/${id}`)
     return response.data
   },
 

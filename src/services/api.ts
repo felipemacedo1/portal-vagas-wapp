@@ -12,7 +12,7 @@ export const api = axios.create({
 
 // Lista de endpoints públicos que não precisam de token
 const publicEndpoints = [
-  '/api/jobs/public',
+  '/api/public/jobs',
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/refresh'
@@ -38,6 +38,17 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Normalize backend error messages for UI
+    try {
+      const r = error?.response
+      const backendMsg = r?.data?.message || r?.data?.error || r?.data?.details || r?.data?.title
+      const normalized = backendMsg || error?.message || 'Erro inesperado ao comunicar com a API'
+      error.userMessage = normalized
+      if (r?.data && typeof r.data === 'object' && !r.data.message) {
+        r.data.message = normalized
+      }
+    } catch {}
+
     const originalRequest = error.config
 
     if (error.response?.status === 401 && !originalRequest._retry) {
