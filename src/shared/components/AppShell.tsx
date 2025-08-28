@@ -1,11 +1,10 @@
 import { useState } from 'react'
-import { Sidebar } from 'primereact/sidebar'
 import { Button } from 'primereact/button'
-import { Divider } from 'primereact/divider'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../../core/stores/authStore'
 import { Header } from '../../components/layout/Header'
 import { Breadcrumbs } from './Breadcrumbs'
+import { AppSidebar } from '../../components/layout/AppSidebar'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -127,53 +126,17 @@ export const AppShell = ({ children }: AppShellProps) => {
     }
   }
 
-  const handleNavigation = (url: string) => {
-    navigate(url)
-    setSidebarVisible(false)
-  }
-
   return (
     <div className="layout-wrapper">
       <Header onMenuToggle={() => setSidebarVisible(true)} />
       
       {isAuthenticated && (
-        <Sidebar
+        <AppSidebar 
           visible={sidebarVisible}
           onHide={() => setSidebarVisible(false)}
-          className="w-full md:w-20rem lg:w-25rem"
-        >
-          <div className="flex flex-column gap-2 p-3">
-            <div className="text-center mb-4">
-              <div className="text-900 font-medium text-xl mb-2">Menu</div>
-              <div className="text-600 text-sm">{user?.email}</div>
-              <div className="text-500 text-xs capitalize mt-1">
-                {user?.role.toLowerCase()}
-              </div>
-            </div>
-            
-            <Divider />
-            
-            {getSidebarItems().map((item, index) => (
-              <Button
-                key={index}
-                label={item.label}
-                icon={item.icon}
-                badge={item.badge}
-                className={`justify-content-start ${item.active ? 'p-button-outlined' : 'p-button-text'}`}
-                onClick={() => handleNavigation(item.url)}
-              />
-            ))}
-            
-            <Divider />
-            
-            <Button
-              label="Buscar Vagas"
-              icon="pi pi-search"
-              className="p-button-text justify-content-start"
-              onClick={() => handleNavigation('/')}
-            />
-          </div>
-        </Sidebar>
+          items={getSidebarItems()}
+          user={user}
+        />
       )}
       
       <main className="layout-main">

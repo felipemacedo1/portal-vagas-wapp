@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { InputText } from 'primereact/inputtext'
 import { useAuth } from '../../shared/hooks/useAuth'
+import { useAdminStats, useCandidateStats, useEmployerStats } from '../../hooks/useStats'
 
 interface HeaderProps {
   onMenuToggle?: () => void
@@ -16,6 +17,9 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
   const navigate = useNavigate()
   const location = useLocation()
   const [q, setQ] = useState('')
+  const adminStats = useAdminStats()
+  const empStats = useEmployerStats()
+  const candStats = useCandidateStats()
 
   useEffect(() => {
     // Sync search box with ?q= from URL
@@ -49,7 +53,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             label: 'Candidaturas',
             icon: 'pi pi-send',
             command: () => navigate('/candidate/applications'),
-            badge: '3'
+            badge: candStats.data?.pendingApplications?.toString()
           }
         ]
 
@@ -70,7 +74,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             label: 'Candidaturas',
             icon: 'pi pi-users',
             command: () => navigate('/employer/applications'),
-            badge: '5'
+            badge: empStats.data?.pendingApplications?.toString()
           }
         ]
 
@@ -86,7 +90,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
             label: 'Moderar',
             icon: 'pi pi-check-circle',
             command: () => navigate('/admin/jobs'),
-            badge: '8'
+            badge: adminStats.data?.pendingJobs?.toString()
           }
         ]
 

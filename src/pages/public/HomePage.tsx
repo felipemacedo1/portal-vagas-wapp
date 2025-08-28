@@ -22,6 +22,7 @@ export const HomePage = () => {
   })
   const [qTitle, setQTitle] = useState('')
   const [qLocation, setQLocation] = useState('')
+  const [verifiedOnly, setVerifiedOnly] = useState(false)
 
   // Initialize from URL ?q
   useEffect(() => {
@@ -42,6 +43,13 @@ export const HomePage = () => {
   }, [qTitle, qLocation])
 
   const { data, isLoading, error } = useJobs(filters)
+  const content = useMemo(() => {
+    let c = data?.content || []
+    if (verifiedOnly) {
+      c = c.filter((j: any) => j.company?.verified)
+    }
+    return c
+  }, [data, verifiedOnly])
 
   const handleSearch = () => {
     setFilters(prev => ({ ...prev, page: 0 }))
@@ -143,6 +151,14 @@ export const HomePage = () => {
                 />
                 <label htmlFor="remote" className="ml-2 font-semibold">Remoto</label>
               </div>
+              <div className="flex align-items-center">
+                <Checkbox
+                  inputId="verified"
+                  checked={verifiedOnly}
+                  onChange={(e) => setVerifiedOnly(!!e.checked)}
+                />
+                <label htmlFor="verified" className="ml-2 font-semibold">Empresas verificadas</label>
+              </div>
               <Button
                 label="Buscar"
                 icon="pi pi-search"
@@ -177,9 +193,9 @@ export const HomePage = () => {
       </div>
 
       {/* Jobs List */}
-      {data?.content && data.content.length > 0 ? (
+      {content && content.length > 0 ? (
         <div className="grid">
-          {data.content.map((job) => (
+          {content.map((job) => (
             <div key={job.id} className="col-12 md:col-6 lg:col-4 p-2">
               <JobCard job={job} />
             </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { jobsService } from '../../services/jobs'
 import { Button } from 'primereact/button'
 import { Badge } from 'primereact/badge'
@@ -21,6 +21,34 @@ export const JobsList = () => {
   const [selectedJob, setSelectedJob] = useState<any>(null)
 
   const { data, isLoading, error, refetch } = useEmployerJobs(0, 20)
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => jobsService.deleteJob(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs','employer'] })
+      showSuccess('Vaga excluída com sucesso!')
+    }
+  })
+
+  const submitMutation = useMutation({
+    mutationFn: (id: number) => jobsService.submitJob(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['jobs','employer'] })
+      const prev = queryClient.getQueriesData({ queryKey: ['jobs','employer'] })
+      queryClient.setQueriesData({ queryKey: ['jobs','employer'] }, (old: any) => {
+        if (!old) return old
+        return { ...old, content: old.content?.map((j: any) => j.id === id ? { ...j, status: 'PENDING' } : j) }
+      })
+      return { prev }
+    },
+    onError: (_e, _vars, ctx) => {
+      ctx?.prev?.forEach(([key, data]: any) => queryClient.setQueryData(key, data))
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs','employer'] })
+      showSuccess('Vaga enviada para aprovação!')
+    }
+  })
 
   const getStatusBadge = (status: string) => {
     const { severity, label } = getJobStatus(status)
@@ -78,9 +106,7 @@ export const JobsList = () => {
   }
 
   const handleSubmit = (job: any) => {
-    // TODO: Implement submit job
-    console.log('Submitting job:', job.id)
-    showSuccess('Vaga enviada para aprovação!')
+    submitMutation.mutate(job.id)
   }
 
   const handleDelete = (job: any) => {
@@ -89,11 +115,13 @@ export const JobsList = () => {
   }
 
   const confirmDelete = () => {
-    // TODO: Implement delete job
-    console.log('Deleting job:', selectedJob.id)
-    showSuccess('Vaga excluída com sucesso!')
-    setConfirmVisible(false)
-    setSelectedJob(null)
+    if (!selectedJob) return
+    deleteMutation.mutate(selectedJob.id, {
+      onSettled: () => {
+        setConfirmVisible(false)
+        setSelectedJob(null)
+      }
+    })
   }
 
   const getActions = (rowData: any) => (
