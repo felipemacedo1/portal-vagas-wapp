@@ -76,20 +76,41 @@ export const useUpdateApplicationStatus = () => {
   return useMutation({
     mutationFn: ({ applicationId, status }: { applicationId: number; status: string }) =>
       jobsService.updateApplicationStatus(applicationId, status),
+    onMutate: async ({ applicationId, status }) => {
+      // Cancel outgoing queries so we don't overwrite optimistic update
+      await queryClient.cancelQueries({ queryKey: applicationsKeys.lists() })
+      
+      const prevEmployer = queryClient.getQueriesData({ queryKey: applicationsKeys.employer() })
+      const prevCandidate = queryClient.getQueriesData({ queryKey: applicationsKeys.candidate() })
+
+      // Optimistically update lists
+      const patchList = (data: any) => {
+        if (!data) return data
+        return {
+          ...data,
+          content: data.content?.map((app: any) => app.id === applicationId ? { ...app, status } : app)
+        }
+      }
+      queryClient.setQueriesData({ queryKey: applicationsKeys.employer() }, (old: any) => patchList(old))
+      queryClient.setQueriesData({ queryKey: applicationsKeys.candidate() }, (old: any) => patchList(old))
+
+      // Return rollback context
+      return { prevEmployer, prevCandidate }
+    },
+    onError: (error: any, _vars, context) => {
+      // Rollback previous values
+      context?.prevEmployer?.forEach(([key, data]: any) => queryClient.setQueryData(key, data))
+      context?.prevCandidate?.forEach(([key, data]: any) => queryClient.setQueryData(key, data))
+      showError('Erro ao atualizar status', error.response?.data?.message)
+    },
     onSuccess: (updatedApplication) => {
-      // Update all related caches
-      queryClient.invalidateQueries({ queryKey: applicationsKeys.lists() })
-      queryClient.invalidateQueries({ 
-        queryKey: applicationsKeys.job(updatedApplication.jobId) 
-      })
+      // Update caches explicitly for job-specific views
+      queryClient.invalidateQueries({ queryKey: applicationsKeys.job(updatedApplication.jobId) })
       
       // Update store
       updateApplication(updatedApplication.id, updatedApplication)
       
       showSuccess('Status da candidatura atualizado!')
-    },
-    onError: (error: any) => {
-      showError('Erro ao atualizar status', error.response?.data?.message)
     }
   })
 }

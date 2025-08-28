@@ -6,19 +6,14 @@ import { useNavigate } from 'react-router-dom'
 import { DataTable } from '../../shared/components/DataTable'
 import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
 import { useCandidateApplications } from '../../hooks/useApplications'
+import { getApplicationStatus } from '../../shared/utils/status'
 
 export const ApplicationsList = () => {
   const navigate = useNavigate()
   const { data, isLoading, error, refetch } = useCandidateApplications(0, 20)
 
   const getStatusBadge = (status: string) => {
-    const config = {
-      PENDING: { severity: 'warning' as const, label: 'Pendente' },
-      APPROVED: { severity: 'success' as const, label: 'Aprovada' },
-      REJECTED: { severity: 'danger' as const, label: 'Rejeitada' },
-      INTERVIEW: { severity: 'info' as const, label: 'Entrevista' }
-    }
-    const { severity, label } = config[status as keyof typeof config] || config.PENDING
+    const { severity, label } = getApplicationStatus(status)
     return <Badge value={label} severity={severity} />
   }
 

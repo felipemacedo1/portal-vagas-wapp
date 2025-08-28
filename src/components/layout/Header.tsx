@@ -2,7 +2,9 @@ import { Menubar } from 'primereact/menubar'
 import { Button } from 'primereact/button'
 import { Avatar } from 'primereact/avatar'
 import { Badge } from 'primereact/badge'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { InputText } from 'primereact/inputtext'
 import { useAuth } from '../../shared/hooks/useAuth'
 
 interface HeaderProps {
@@ -12,6 +14,15 @@ interface HeaderProps {
 export const Header = ({ onMenuToggle }: HeaderProps) => {
   const { user, logout, isAuthenticated } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [q, setQ] = useState('')
+
+  useEffect(() => {
+    // Sync search box with ?q= from URL
+    const params = new URLSearchParams(location.search)
+    const qp = params.get('q') || ''
+    setQ(qp)
+  }, [location.search])
 
   const getMenuItems = () => {
     const baseItems = [
@@ -100,6 +111,26 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
         <span className="text-xl font-bold text-gradient">
           Portal de Vagas
         </span>
+      </div>
+
+      {/* Global quick search (desktop) */}
+      <div className="hidden md:flex align-items-center ml-4">
+        <div className="p-inputgroup">
+          <span className="p-inputgroup-addon"><i className="pi pi-search" /></span>
+          <InputText
+            placeholder="Buscar vagas..."
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                const p = new URLSearchParams(window.location.search)
+                if (q) p.set('q', q); else p.delete('q')
+                navigate({ pathname: '/', search: p.toString() })
+              }
+            }}
+            className="w-20rem"
+          />
+        </div>
       </div>
     </div>
   )

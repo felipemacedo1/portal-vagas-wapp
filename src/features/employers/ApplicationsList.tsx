@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { jobsService } from '../../services/jobs'
 import { Badge } from 'primereact/badge'
 import { Button } from 'primereact/button'
 import { Card } from 'primereact/card'
@@ -8,8 +11,11 @@ import { Message } from 'primereact/message'
 import { DataTable } from '../../shared/components/DataTable'
 import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
 import { useEmployerApplications, useUpdateApplicationStatus } from '../../hooks/useApplications'
+import { getApplicationStatus } from '../../shared/utils/status'
 
 export const ApplicationsList = () => {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [selectedApplication, setSelectedApplication] = useState<any>(null)
   const [detailsVisible, setDetailsVisible] = useState(false)
 
@@ -24,13 +30,7 @@ export const ApplicationsList = () => {
   ]
 
   const getStatusBadge = (status: string) => {
-    const config = {
-      PENDING: { severity: 'warning' as const, label: 'Pendente' },
-      APPROVED: { severity: 'success' as const, label: 'Aprovada' },
-      REJECTED: { severity: 'danger' as const, label: 'Rejeitada' },
-      INTERVIEW: { severity: 'info' as const, label: 'Entrevista' }
-    }
-    const { severity, label } = config[status as keyof typeof config] || config.PENDING
+    const { severity, label } = getApplicationStatus(status)
     return <Badge value={label} severity={severity} />
   }
 
@@ -166,7 +166,10 @@ export const ApplicationsList = () => {
             label="Ver Minhas Vagas"
             icon="pi pi-briefcase"
             className="btn-gradient"
-            onClick={() => window.location.href = '/employer/jobs'}
+            onClick={() => navigate('/employer/jobs')}
+            onMouseEnter={() => {
+              queryClient.prefetchQuery({ queryKey: ['jobs','employer',0], queryFn: () => jobsService.getEmployerJobs(0, 20) })
+            }}
           />
         </Card>
       ) : (

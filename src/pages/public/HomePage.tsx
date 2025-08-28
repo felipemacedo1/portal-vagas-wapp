@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { InputText } from 'primereact/inputtext'
 import { Button } from 'primereact/button'
 import { Checkbox } from 'primereact/checkbox'
@@ -8,8 +8,11 @@ import { Card } from 'primereact/card'
 import { useJobs } from '../../hooks/useJobs'
 import { JobCard } from '../../components/ui/JobCard'
 import type { JobFilters } from '../../types/jobs'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 
 export const HomePage = () => {
+  const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [filters, setFilters] = useState<JobFilters>({
     title: '',
     location: '',
@@ -17,6 +20,26 @@ export const HomePage = () => {
     page: 0,
     size: 12
   })
+  const [qTitle, setQTitle] = useState('')
+  const [qLocation, setQLocation] = useState('')
+
+  // Initialize from URL ?q
+  useEffect(() => {
+    const q = searchParams.get('q') || ''
+    setQTitle(q)
+    setFilters(prev => ({ ...prev, title: q, page: 0 }))
+  }, [])
+
+  // Debounce input changes into filters
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setFilters(prev => ({ ...prev, title: qTitle, location: qLocation, page: 0 }))
+      const params = new URLSearchParams(searchParams)
+      if (qTitle) params.set('q', qTitle); else params.delete('q')
+      setSearchParams(params)
+    }, 350)
+    return () => clearTimeout(handle)
+  }, [qTitle, qLocation])
 
   const { data, isLoading, error } = useJobs(filters)
 
@@ -89,8 +112,8 @@ export const HomePage = () => {
               </span>
               <InputText
                 placeholder="Cargo ou palavra-chave"
-                value={filters.title || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, title: e.target.value }))}
+                value={qTitle}
+                onChange={(e) => setQTitle(e.target.value)}
                 className="border-round-lg"
               />
             </div>
@@ -103,8 +126,8 @@ export const HomePage = () => {
               </span>
               <InputText
                 placeholder="Localização"
-                value={filters.location || ''}
-                onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+                value={qLocation}
+                onChange={(e) => setQLocation(e.target.value)}
                 className="border-round-lg"
               />
             </div>

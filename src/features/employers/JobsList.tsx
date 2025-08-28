@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
+import { jobsService } from '../../services/jobs'
 import { Button } from 'primereact/button'
 import { Badge } from 'primereact/badge'
 import { Card } from 'primereact/card'
@@ -8,10 +10,12 @@ import { ConfirmDialog } from 'primereact/confirmdialog'
 import { DataTable } from '../../shared/components/DataTable'
 import { LoadingSkeleton } from '../../shared/components/LoadingSkeleton'
 import { useEmployerJobs } from '../../hooks/useJobs'
+import { getJobStatus } from '../../shared/utils/status'
 import { useToast } from '../../core/providers/ToastProvider'
 
 export const JobsList = () => {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { showSuccess } = useToast()
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [selectedJob, setSelectedJob] = useState<any>(null)
@@ -19,13 +23,7 @@ export const JobsList = () => {
   const { data, isLoading, error, refetch } = useEmployerJobs(0, 20)
 
   const getStatusBadge = (status: string) => {
-    const config = {
-      APPROVED: { severity: 'success' as const, label: 'Aprovada' },
-      PENDING: { severity: 'warning' as const, label: 'Pendente' },
-      DRAFT: { severity: 'secondary' as const, label: 'Rascunho' },
-      REJECTED: { severity: 'danger' as const, label: 'Rejeitada' }
-    }
-    const { severity, label } = config[status as keyof typeof config] || config.DRAFT
+    const { severity, label } = getJobStatus(status)
     return <Badge value={label} severity={severity} />
   }
 
@@ -180,6 +178,10 @@ export const JobsList = () => {
           icon="pi pi-plus"
           className="btn-gradient"
           onClick={() => navigate('/employer/jobs/new')}
+          onMouseEnter={() => {
+            // Prefetch applications list to speed up later navigation
+            queryClient.prefetchQuery({ queryKey: ['applications','employer',0], queryFn: () => jobsService.getEmployerApplications(0, 20) })
+          }}
         />
       </div>
 
