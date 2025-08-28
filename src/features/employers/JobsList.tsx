@@ -199,9 +199,13 @@ export const JobsList = () => {
         </Card>
       ) : (
         <DataTable
+          id="employer-jobs"
           data={data.content}
           columns={columns}
           actions={getActions}
+          rowsPerPageOptions={[10,20,50]}
+          stickyHeader
+          columnToggle
           exportable
           onExport={() => console.log('Exporting jobs...')}
         />

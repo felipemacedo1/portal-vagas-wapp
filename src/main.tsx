@@ -10,6 +10,7 @@ import 'primeicons/primeicons.css'
 import 'primeflex/primeflex.css'
 
 // Custom Theme
+import './styles/tokens.css'
 import './styles/theme.css'
 import './styles/components.css'
 import './styles/auth.css'

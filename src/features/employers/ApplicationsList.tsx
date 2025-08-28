@@ -171,9 +171,13 @@ export const ApplicationsList = () => {
         </Card>
       ) : (
         <DataTable
+          id="employer-applications"
           data={data.content}
           columns={columns}
           actions={getActions}
+          rowsPerPageOptions={[10,20,50]}
+          stickyHeader
+          columnToggle
           exportable
           onExport={() => console.log('Exporting applications...')}
         />

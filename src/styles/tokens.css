@@ -1,0 +1,66 @@
+/* Design Tokens - Portal de Vagas */
+
+/* Google Fonts (loaded at runtime) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Brand */
+  --pv-color-primary: #FF9A23; /* Vibrant orange */
+  --pv-color-primary-contrast: #0F172A; /* Deep slate for contrast */
+
+  /* Neutrals */
+  --pv-color-bg: #F3F4F6;       /* surface ground */
+  --pv-color-surface: #FFFFFF;  /* cards */
+  --pv-color-border: #E5E7EB;   /* subtle borders */
+  --pv-color-text: #1F2937;     /* primary text */
+  --pv-color-text-weak: #6B7280;/* secondary */
+
+  /* Semantic */
+  --pv-color-success: #16A34A;
+  --pv-color-warning: #F59E0B;
+  --pv-color-danger:  #DC2626;
+  --pv-color-info:    #2563EB;
+
+  /* Typography */
+  --pv-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --pv-font-size-xs: 12px;
+  --pv-font-size-sm: 14px;
+  --pv-font-size-md: 16px;
+  --pv-font-size-lg: 18px;
+  --pv-line-height: 1.6;
+
+  /* Spacing */
+  --pv-space-1: 4px;
+  --pv-space-2: 8px;
+  --pv-space-3: 12px;
+  --pv-space-4: 16px;
+  --pv-space-5: 24px;
+  --pv-space-6: 32px;
+
+  /* Shape & Elevation */
+  --pv-radius: 8px;
+  --pv-shadow-1: 0 1px 2px rgba(0,0,0,.06);
+  --pv-shadow-2: 0 4px 8px rgba(0,0,0,.08);
+  --pv-shadow-3: 0 10px 16px rgba(0,0,0,.10);
+
+  /* Focus */
+  --pv-focus-ring: 0 0 0 3px rgba(255,154,35, .35);
+}
+
+/* Global resets that leverage tokens */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background: var(--pv-color-bg);
+  color: var(--pv-color-text);
+  font-family: var(--pv-font-family);
+  line-height: var(--pv-line-height);
+}
+
+*:focus {
+  outline: none;
+  box-shadow: var(--pv-focus-ring);
+}
+
