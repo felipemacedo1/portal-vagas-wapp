@@ -1,19 +1,21 @@
 /* Design Tokens - Portal de Vagas */
 
-/* Google Fonts (loaded at runtime) */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   /* Brand */
-  --pv-color-primary: #FF9A23; /* Vibrant orange */
-  --pv-color-primary-contrast: #0F172A; /* Deep slate for contrast */
+  --pv-color-primary: #FF9A23; /* Energia */
+  --pv-color-primary-contrast: #0F172A; /* Slate */
+  --pv-color-accent-teal: #0EA5A6;
+  --pv-color-accent-blue: #2563EB;
 
   /* Neutrals */
-  --pv-color-bg: #F3F4F6;       /* surface ground */
-  --pv-color-surface: #FFFFFF;  /* cards */
-  --pv-color-border: #E5E7EB;   /* subtle borders */
-  --pv-color-text: #1F2937;     /* primary text */
-  --pv-color-text-weak: #6B7280;/* secondary */
+  --pv-color-bg: #F3F4F6;          /* surface ground */
+  --pv-color-surface: #FFFFFF;     /* cards */
+  --pv-color-surface-2: #FAFAFB;   /* alt cards */
+  --pv-color-border: #E5E7EB;      /* subtle borders */
+  --pv-color-text: #1F2937;        /* primary text */
+  --pv-color-text-weak: #6B7280;   /* secondary */
 
   /* Semantic */
   --pv-color-success: #16A34A;
@@ -21,13 +23,21 @@
   --pv-color-danger:  #DC2626;
   --pv-color-info:    #2563EB;
 
+  /* States */
+  --pv-state-hover: rgba(15, 23, 42, 0.05);
+  --pv-state-active: rgba(15, 23, 42, 0.10);
+  --pv-state-disabled: 0.5; /* opacity */
+
   /* Typography */
   --pv-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --pv-line-height: 1.6;
   --pv-font-size-xs: 12px;
   --pv-font-size-sm: 14px;
   --pv-font-size-md: 16px;
   --pv-font-size-lg: 18px;
-  --pv-line-height: 1.6;
+  --pv-h1-size: 40px; --pv-h1-line: 48px;
+  --pv-h2-size: 32px; --pv-h2-line: 40px;
+  --pv-h3-size: 24px; --pv-h3-line: 32px;
 
   /* Spacing */
   --pv-space-1: 4px;
@@ -36,6 +46,22 @@
   --pv-space-4: 16px;
   --pv-space-5: 24px;
   --pv-space-6: 32px;
+  --pv-space-7: 40px;
+  --pv-space-8: 48px;
+
+  /* Z-index scale */
+  --pv-z-dropdown: 1000;
+  --pv-z-overlay: 1100;
+  --pv-z-modal: 1200;
+  --pv-z-toast: 1300;
+
+  /* Data Viz */
+  --pv-chart-1: #FF9A23;
+  --pv-chart-2: #0EA5A6;
+  --pv-chart-3: #2563EB;
+  --pv-chart-4: #22C55E;
+  --pv-chart-5: #F59E0B;
+  --pv-chart-6: #EF4444;
 
   /* Shape & Elevation */
   --pv-radius: 8px;
@@ -47,20 +73,25 @@
   --pv-focus-ring: 0 0 0 3px rgba(255,154,35, .35);
 }
 
-/* Global resets that leverage tokens */
-html, body, #root {
-  height: 100%;
+/* Dark Mode */
+:root[data-theme="dark"] {
+  --pv-color-bg: #0B1220;
+  --pv-color-surface: #0F172A;
+  --pv-color-surface-2: #111827;
+  --pv-color-border: #1F2937;
+  --pv-color-text: #E5E7EB;
+  --pv-color-text-weak: #9CA3AF;
+  --pv-state-hover: rgba(255, 255, 255, 0.06);
+  --pv-state-active: rgba(255, 255, 255, 0.12);
+  --pv-focus-ring: 0 0 0 3px rgba(255,154,35, .45);
 }
 
+/* Global base */
+html, body, #root { height: 100%; }
 body {
   background: var(--pv-color-bg);
   color: var(--pv-color-text);
   font-family: var(--pv-font-family);
   line-height: var(--pv-line-height);
 }
-
-*:focus {
-  outline: none;
-  box-shadow: var(--pv-focus-ring);
-}
-
+*:focus { outline: none; box-shadow: var(--pv-focus-ring); }

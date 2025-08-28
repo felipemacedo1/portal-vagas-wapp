@@ -3,8 +3,12 @@
   /* Bridge tokens -> Prime/Lara variables */
   --primary-color: var(--pv-color-primary);
   --text-color: var(--pv-color-text);
+  --text-color-secondary: var(--pv-color-text-weak);
   --surface-ground: var(--pv-color-bg);
+  --surface-section: var(--pv-color-surface-2);
   --surface-card: var(--pv-color-surface);
+  --surface-hover: var(--pv-state-hover);
+  --surface-active: var(--pv-state-active);
   --surface-border: var(--pv-color-border);
 
   /* Legacy variables kept for internal styles */
@@ -31,12 +35,19 @@
   --section-gap: 2rem;
 }
 
-body {
-  font-family: var(--pv-font-family);
-  background: var(--surface-ground);
-  min-height: 100vh;
-  line-height: var(--pv-line-height);
+/* Dark theme mapping */
+:root[data-theme="dark"] {
+  --text-color: var(--pv-color-text);
+  --text-color-secondary: var(--pv-color-text-weak);
+  --surface-ground: var(--pv-color-bg);
+  --surface-section: var(--pv-color-surface-2);
+  --surface-card: var(--pv-color-surface);
+  --surface-hover: var(--pv-state-hover);
+  --surface-active: var(--pv-state-active);
+  --surface-border: var(--pv-color-border);
 }
+
+body { font-family: var(--pv-font-family); background: var(--surface-ground); min-height: 100vh; line-height: var(--pv-line-height); }
 
 /* Layout Containers */
 .content-container {
@@ -168,3 +179,16 @@ body {
   max-width: 800px;
   margin: 0 auto;
 }
+
+/* Header & Sidebar tweaks */
+.p-menubar { border: none; box-shadow: var(--shadow-sm); background: var(--surface-card); }
+.p-menubar .p-menuitem-link:hover { background: var(--surface-hover); }
+.p-sidebar { background: var(--surface-card); }
+
+/* Focus ring across components */
+.p-inputtext:focus, .p-dropdown:focus, .p-multiselect:focus, .p-button:focus { box-shadow: var(--pv-focus-ring); }
+
+/* Dark specific nuances */
+:root[data-theme="dark"] .card-modern { border-color: var(--surface-border); }
+:root[data-theme="dark"] .p-menubar { background: var(--surface-card); }
+:root[data-theme="dark"] .p-inputtext, :root[data-theme="dark"] .p-dropdown, :root[data-theme="dark"] .p-multiselect { background: var(--surface-section); color: var(--text-color); border-color: var(--surface-border); }

@@ -4,6 +4,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ErrorBoundary } from './core/providers/ErrorBoundary'
 import { ToastProvider } from './core/providers/ToastProvider'
 import { AppShell } from './shared/components/AppShell'
+import { ThemeProvider } from './core/providers/ThemeProvider'
 import { ProtectedRoute } from './components/layout/ProtectedRoute'
 
 // Public Pages
@@ -43,8 +44,9 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <ToastProvider>
-          <AppShell>
-            <Routes>
+          <ThemeProvider>
+            <AppShell>
+              <Routes>
               {/* Public Routes */}
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -127,8 +129,9 @@ function App() {
                   </button>
                 </div>
               } />
-            </Routes>
-          </AppShell>
+              </Routes>
+            </AppShell>
+          </ThemeProvider>
         </ToastProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

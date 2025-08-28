@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { InputText } from 'primereact/inputtext'
 import { useAuth } from '../../shared/hooks/useAuth'
 import { useAdminStats, useCandidateStats, useEmployerStats } from '../../hooks/useStats'
+import { useTheme } from '../../core/providers/ThemeProvider'
 
 interface HeaderProps {
   onMenuToggle?: () => void
@@ -20,6 +21,7 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
   const adminStats = useAdminStats()
   const empStats = useEmployerStats()
   const candStats = useCandidateStats()
+  const { theme, toggle } = useTheme()
 
   useEffect(() => {
     // Sync search box with ?q= from URL
@@ -141,6 +143,13 @@ export const Header = ({ onMenuToggle }: HeaderProps) => {
 
   const end = (
     <div className="flex align-items-center gap-2">
+      {/* Theme toggle */}
+      <Button
+        icon={theme === 'dark' ? 'pi pi-sun' : 'pi pi-moon'}
+        className="p-button-text"
+        onClick={toggle}
+        tooltip={theme === 'dark' ? 'Modo claro' : 'Modo escuro'}
+      />
       {isAuthenticated ? (
         <>
           <div className="hidden md:flex align-items-center gap-2 mr-3 p-2 border-round-lg bg-primary-50">
